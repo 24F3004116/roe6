@@ -1,0 +1,54 @@
+# This is the name of your workflow
+name: Multi-Platform Matrix Build
+
+# This tells GitHub when to run the workflow
+on:
+  # Run it on any push to the main branch
+  push:
+    branches: [ main ]
+  # This also allows you to run it manually from the "Actions" tab
+  workflow_dispatch:
+
+# This section defines the jobs to run
+jobs:
+  build:
+    # We will run this job on the latest version of Ubuntu
+    runs-on: ubuntu-latest
+
+    # This is the matrix strategy
+    strategy:
+      matrix:
+        # We define a "variable" called 'python-version'
+        # It has 3 different values, which will cause GitHub
+        # to run this 'build' job 3 separate times.
+        python-version: ['3.9', '3.10', '3.11']
+
+    # These are the steps that run for EACH matrix job
+    steps:
+      # Step 1: Set up the specific Python version for this job
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      # Step 2: This step has the required identifier
+      # We'll just print the version to the log
+      - name: Display Python Version
+        id: matrix-ac79f97
+        run: echo "Building for Python version ${{ matrix.python-version }}"
+
+      # Step 3: Create a unique artifact file
+      - name: Generate build artifact
+        run: |
+          echo "This is the unique build output for Python ${{ matrix.python-version }}" > build-output.txt
+          echo "Timestamp: $(date)" >> build-output.txt
+          echo "Running on: ${{ runner.os }}" >> build-output.txt
+
+      # Step 4: Upload the file we just created as an artifact
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          # The artifact name uses the required prefix + the matrix variant
+          name: build-ac79f97-python-${{ matrix.python-version }}
+          # The path to the file we want to upload
+          path: build-output.txt
