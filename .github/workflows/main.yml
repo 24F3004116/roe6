@@ -8,8 +8,6 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    
-    # This 'strategy' block is the part that creates the matrix
     strategy:
       matrix:
         python-version: ['3.9', '3.10', '3.11']
@@ -20,9 +18,11 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
+      # --- THIS IS THE REQUIRED STEP ---
       - name: Display Python Version
         id: matrix-ac79f97
         run: echo "Building for Python version ${{ matrix.python-version }}"
+      # ---------------------------------
 
       - name: Generate build artifact
         run: |
